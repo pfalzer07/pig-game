@@ -21,27 +21,56 @@ diceEl.classList.add('hidden');
 
 let currentScore = 0;
 let activePlayer = 0;
+let playing = true;
+
+const switchPlayer = function () {
+  document.getElementById(`current--${activePlayer}`).textContent = 0;
+  activePlayer = activePlayer === 0 ? 1 : 0;
+  currentScore = 0;
+  player0.classList.toggle('player--active');
+  player1.classList.toggle('player--active');
+};
 
 //Rolling dice
 btnRoll.addEventListener('click', function () {
-  //Generate random roll
-  const dice = Math.trunc(Math.random() * 6) + 1;
+  if (playing) {
+    //Generate random roll
+    const dice = Math.trunc(Math.random() * 6) + 1;
 
-  //Display dice
-  diceEl.classList.remove('hidden');
-  console.log(dice);
-  diceEl.src = `dice-${dice}.png`;
+    //Display dice
+    diceEl.classList.remove('hidden');
+    console.log(dice);
+    diceEl.src = `dice-${dice}.png`;
 
-  //Check for rolled 1
-  if (dice !== 1) {
-    currentScore += dice;
-    document.getElementById(`current--${activePlayer}`).textContent =
-      currentScore;
+    //Check for rolled 1
+    if (dice !== 1) {
+      currentScore += dice;
+      document.getElementById(`current--${activePlayer}`).textContent =
+        currentScore;
+    } else {
+      switchPlayer();
+    }
+  }
+});
+
+btnHold.addEventListener('click', function () {
+  if (playing) {
+    //add current score to active player score
+    scores[activePlayer] += currentScore;
+    document.getElementById(`score--${activePlayer}`).textContent =
+      scores[activePlayer];
+
+    // check if score > 100 to win game
+    if (scores[activePlayer] >= 20) {
+      playing = false;
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.add('player--winner');
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.remove('player--active');
+    }
   } else {
-    document.getElementById(`current--${activePlayer}`).textContent = 0;
-    activePlayer = activePlayer === 0 ? 1 : 0;
-    currentScore = 0;
-    player0.classList.toggle('player--active');
-    player1.classList.toggle('player--active');
+    switchPlayer();
   }
 });
